@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 
 	"github.com/spf13/cobra"
 )
@@ -24,6 +27,27 @@ var structToJsonCmd = &cobra.Command{
 	Run:   ToJson,
 }
 
-func ToJson(cmd *cobra.Command, args []string) {
+func ToJson(_ *cobra.Command, _ []string) {
 	fmt.Println("toJson", gos)
+	importStr := "package stj\n" + gos
+	fmt.Println(importStr)
+	fset := token.NewFileSet() // positions are relative to fset
+	f, err := parser.ParseFile(fset, "", importStr, 0)
+	if err != nil {
+		panic(err)
+	}
+	ast.Inspect(f, func(n ast.Node) bool {
+		if n == nil {
+			return false
+		}
+		switch n.(type) {
+		case *ast.StructType:
+			// fmt.Println(n)
+			return true
+		default:
+			return false
+		}
+	})
+	// Print the AST.
+	// ast.Print(fset, f)
 }
