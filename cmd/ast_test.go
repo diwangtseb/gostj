@@ -25,6 +25,7 @@ func TestXxx(t *testing.T) {
 					fmt.Println(t.Name.Name)
 					fmt.Println(field.Names[0])
 					fmt.Println(field.Tag.Value)
+					fmt.Println(field.Type)
 				}
 			}
 		}

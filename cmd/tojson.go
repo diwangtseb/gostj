@@ -5,7 +5,9 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"regexp"
 
+	"github.com/bytedance/sonic"
 	"github.com/spf13/cobra"
 )
 
@@ -36,18 +38,56 @@ func ToJson(_ *cobra.Command, _ []string) {
 	if err != nil {
 		panic(err)
 	}
-	ast.Inspect(f, func(n ast.Node) bool {
-		if n == nil {
-			return false
+	t := astParse(f)
+	fmt.Println(t.toJson())
+}
+
+type Tag []string
+
+func (t *Tag) append(ele string) {
+	*t = append(*t, ele)
+}
+func (t *Tag) toJson() string {
+	m := make(map[string]interface{})
+	for _, i := range *t {
+		m[i] = i
+	}
+	r, err := sonic.Marshal(m)
+	if err != nil {
+		panic("struct convert json failed")
+	}
+	return string(r)
+}
+
+func astParse(f *ast.File) *Tag {
+	tag := &Tag{}
+	for _, d := range f.Decls {
+		if f, ok := d.(*ast.GenDecl); ok {
+			for _, s := range f.Specs {
+				t := s.(*ast.TypeSpec)
+				st := t.Type.(*ast.StructType)
+				for _, field := range st.Fields.List {
+					// log.Println(t.Name.Name)
+					// log.Println(field.Names[0])
+					// log.Println(field.Tag.Value)
+					tag.append(tagParse(field.Tag.Value))
+				}
+			}
 		}
-		switch n.(type) {
-		case *ast.StructType:
-			// fmt.Println(n)
-			return true
-		default:
-			return false
-		}
-	})
-	// Print the AST.
-	// ast.Print(fset, f)
+	}
+	return tag
+}
+
+func tagParse(t string) string {
+	// express := `(?<=").+?(?=")`
+	express := `".*"`
+	r, err := regexp.Compile(express)
+	if err != nil {
+		return "go struct json tag parse error"
+	}
+	mt := r.FindStringSubmatch(t)
+	mts := mt[0]
+	mtsb := []byte(mts)
+	mts = string(mtsb[1 : len(mtsb)-1])
+	return mts
 }
