@@ -1,4 +1,4 @@
-module diwangtseb/gostj
+module github.com/diwangtseb/gostj
 
 go 1.18
 
