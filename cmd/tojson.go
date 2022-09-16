@@ -30,9 +30,7 @@ var structToJsonCmd = &cobra.Command{
 }
 
 func ToJson(_ *cobra.Command, _ []string) {
-	fmt.Println("toJson", gos)
 	importStr := "package stj\n" + gos
-	fmt.Println(importStr)
 	fset := token.NewFileSet() // positions are relative to fset
 	f, err := parser.ParseFile(fset, "", importStr, 0)
 	if err != nil {
