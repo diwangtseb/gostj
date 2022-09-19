@@ -26,10 +26,10 @@ var structToJsonCmd = &cobra.Command{
 	Use:   "stjc",
 	Short: Instructions,
 	Long:  Instructions,
-	Run:   ToJson,
+	Run:   SToJson,
 }
 
-func ToJson(_ *cobra.Command, _ []string) {
+func SToJson(_ *cobra.Command, _ []string) {
 	importStr := "package stj\n" + gos
 	fset := token.NewFileSet() // positions are relative to fset
 	f, err := parser.ParseFile(fset, "", importStr, 0)

@@ -4,3 +4,8 @@ go cli struct to json
 ```bash
 gostj  stjc -j "type Foo struct{ Bar string \`json:\"bar\"\`}"
 ```
+
+
+```bash
+gostj  fstjc -f "/a/b/c/xx.go"
+```
